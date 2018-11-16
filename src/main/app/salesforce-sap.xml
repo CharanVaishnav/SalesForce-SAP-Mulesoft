@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:context="http://www.springframework.org/schema/context" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+    <sfdc:config name="Salesforce__Basic_Authentication" username="aible@zorang.com" password="Z0rangMul3s0ft!" securityToken="lo6ekgjLnkHPkxFwr7UFbvLHC" doc:name="Salesforce: Basic Authentication"/>
+    <db:generic-config name="Generic_Database_Configuration" url="${db.url}" driverClassName="${db.driver}" doc:name="Generic Database Configuration"/>
+    <context:property-placeholder location="common.properties"/>
+    <http:request-config name="Get_SAP_Token" protocol="HTTPS" host="sapes5.sapdevcenter.com" port="443" enableCookies="true" doc:name="HTTP Request Configuration" followRedirects="false">
+        <http:basic-authentication username="P2000827548" password="Z0rang!"/>
+    </http:request-config>
+    <http:request-config name="Post_SAP" host="sapes5.sapdevcenter.com" port="80" enableCookies="true" doc:name="HTTP Request Configuration" followRedirects="false"/>
+    <jms:activemq-connector name="Active_MQ" username="admin" password="admin" brokerURL="tcp://localhost:61617" validateConnections="true" doc:name="Active MQ"/>
+    <flow name="salesforce-sapFlow">
+        <sfdc:subscribe-topic config-ref="Salesforce__Basic_Authentication" topic="insertIntoMuleFlow" doc:name="Salesforce (Streaming)"/>
+        <logger message="#[payload]" level="INFO" doc:name="Salesforce Data"/>
+        <set-variable variableName="consumerId" value="#[payload.Id]" doc:name="Variable"/>
+        
+        <dw:transform-message doc:name="Transform Message" metadata:id="aaaa5e07-0cf1-496a-9457-29cb2fc5bf8b">
+            <dw:input-payload mimeType="application/java"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	Note: payload.Name,
+	NoteLanguage: "EN",
+	CustomerID: "0100000006",
+	CustomerName: payload.Name,
+	CurrencyCode: "USD",
+	GrossAmount: payload.Amount as :string,
+	NetAmount: payload.Amount as :string,
+	TaxAmount: payload.Amount as :string,
+	LifecycleStatus: "C",
+	LifecycleStatusDescription: "In Progress",
+	BillingStatus: null,
+	BillingStatusDescription : "Initial",
+	DeliveryStatus: null,
+	DeliveryStatusDescription: "Initial",
+	CreatedAt: now as :datetime as :string { format: "yyyy-MM-dd'T'HH:mm:ss.SSS" },
+	ChangedAt: now as :datetime as :string { format: "yyyy-MM-dd'T'HH:mm:ss.SSS" }
+}]]></dw:set-payload>
+            <dw:set-variable variableName="SalesforceData1"><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	Note: payload.Name,
+	NoteLanguage: "EN",
+	CustomerID: "0100000006",
+	CustomerName: payload.Name,
+	CurrencyCode: "USD",
+	GrossAmount: payload.Amount as :string,
+	NetAmount: payload.Amount as :string,
+	TaxAmount: payload.Amount as :string,
+	LifecycleStatus: "C",
+	LifecycleStatusDescription: "In Progress",
+	BillingStatus: null,
+	BillingStatusDescription : "Initial",
+	DeliveryStatus: null,
+	DeliveryStatusDescription: "Initial",
+	CreatedAt: now as :datetime as :string { format: "yyyy-MM-dd'T'HH:mm:ss.SSS" },
+	ChangedAt: now as :datetime as :string { format: "yyyy-MM-dd'T'HH:mm:ss.SSS" }
+}]]></dw:set-variable>
+        </dw:transform-message>
+        <set-variable variableName="SalesForceData" value="#[payload]" doc:name="SalesFoce Data"/>
+        
+        <http:request config-ref="Get_SAP_Token" path="/sap/opu/odata/iwbep/GWSAMPLE_BASIC" method="GET" doc:name="HTTP">
+            <http:request-builder>
+                <http:header headerName="x-csrf-token" value="fetch"/>
+            </http:request-builder>
+        </http:request>
+        <set-variable variableName="x-csrf-token" value="#[message.inboundProperties.'x-csrf-token']" doc:name="x-csrf-token"/>
+        <set-payload value="#[flowVars.SalesForceData]" doc:name="Set Payload" mimeType="application/json"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <http:request config-ref="Get_SAP_Token" path="sap/opu/odata/iwbep/GWSAMPLE_BASIC/SalesOrderSet" method="POST" doc:name="HTTP">
+            <http:request-builder>
+                <http:header headerName="x-csrf-token" value="#[flowVars.'x-csrf-token']"/>
+                <http:header headerName="Content-Type" value="application/json"/>
+                <http:header headerName="Authorization" value="Basic UDIwMDA4Mjc1NDg6WjByYW5nIQ=="/>
+            </http:request-builder>
+        </http:request>
+        <object-to-string-transformer doc:name="Object to String"/>
+        <scatter-gather doc:name="Scatter-Gather">
+            <processor-chain>
+                <dw:transform-message doc:name="Transform Message" metadata:id="142045f1-4fc0-430d-810a-8c3c7277f94a">
+                    <dw:input-payload mimeType="application/xml"/>
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+%namespace ns1 http://schemas.microsoft.com/ado/2007/08/dataservices/metadata
+%namespace ns0 http://schemas.microsoft.com/ado/2007/08/dataservices
+%namespace ns02 http://www.w3.org/2005/Atom
+---
+[{
+	Id: flowVars.consumerId,
+	OrderNumber__c: payload.ns02#entry.ns02#content.ns1#properties.ns0#SalesOrderID as :string
+}]]]></dw:set-payload>
+                </dw:transform-message>
+                <sfdc:upsert config-ref="Salesforce__Basic_Authentication" externalIdFieldName="Id" type="Opportunity" doc:name="Salesforce">
+                    <sfdc:objects ref="#[payload]"/>
+                </sfdc:upsert>
+                <choice doc:name="Choice">
+                    <when expression="#[payload[0].errors != null]">
+                        <logger message="Insertion Status : #[payload[0].created]  Update Status : #[payload[0].success]" level="INFO" doc:name="Success Log"/>
+                    </when>
+                    <otherwise>
+                        <logger message="#[payload[0].errors[0].message]" level="INFO" doc:name="Error Log"/>
+                    </otherwise>
+                </choice>
+            </processor-chain>
+            <processor-chain>
+                <json:xml-to-json-transformer doc:name="XML to JSON"/>
+                <jms:outbound-endpoint exchange-pattern="request-response" queue="SAP to Salesforce" connector-ref="Active_MQ" doc:name="JMS"/>
+            </processor-chain>
+            <processor-chain>
+                <set-payload value="#[flowVars.SalesforceData1]" mimeType="application/json" doc:name="Set Payload"/>
+                <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+                <jms:outbound-endpoint queue="Salesforce to SAP" connector-ref="Active_MQ" doc:name="JMS"/>
+            </processor-chain>
+        </scatter-gather>
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-variable variableName="exception" value="#[message.exception]" doc:name="exception"/>
+            <logger level="INFO" doc:name="Logger"/>
+            <set-payload value="#[flowVars.exception]" doc:name="Set Payload"/>
+            <set-property propertyName="http.status" value="500" doc:name="Http Status"/>
+        </catch-exception-strategy>
+    </flow>
+    <flow name="salesforce-sapFlow1">
+<sfdc:subscribe-topic config-ref="Salesforce__Basic_Authentication" topic="salesforceOrderID3" doc:name="Salesforce (Streaming)"/>
+        <logger message="#[payload]" level="INFO" doc:name="Salesforce Data"/>
+        <set-variable variableName="consumerId" value="#[payload.Id]" doc:name="Variable"/>
+        <set-variable variableName="ProductId" value="#[payload.ProductCode__c]" doc:name="Variable"/>
+
+        <set-variable variableName="SalesForceData" value="#[payload]" doc:name="SalesFoce Data"/>
+        <sfdc:retrieve config-ref="Salesforce__Basic_Authentication" type="Product2" doc:name="Salesforce">
+            <sfdc:ids>
+                <sfdc:id>#[flowVars.ProductId]</sfdc:id>
+            </sfdc:ids>
+            <sfdc:fields>
+                <sfdc:field>ProductCode</sfdc:field>
+            </sfdc:fields>
+        </sfdc:retrieve>
+        <set-variable variableName="ProductCode" value="#[payload[0].ProductCode]" doc:name="ProductCode"/>
+
+        <http:request config-ref="Get_SAP_Token" path="/sap/opu/odata/iwbep/GWSAMPLE_BASIC" method="GET" doc:name="HTTP">
+            <http:request-builder>
+                <http:header headerName="x-csrf-token" value="fetch"/>
+            </http:request-builder>
+        </http:request>
+        <set-variable variableName="x-csrf-token" value="#[message.inboundProperties.'x-csrf-token']" doc:name="x-csrf-token"/>
+        <set-payload value="#[flowVars.SalesForceData]" doc:name="Set Payload" />
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	SalesOrderID: payload.OrderNumber__c,
+	ItemPosition: "0000000010",
+	ProductID: flowVars.ProductCode,
+	Note: payload.Name,
+	NoteLanguage: "EN",
+	CurrencyCode: "USD",
+	GrossAmount: payload.Amount as :string,
+	NetAmount: payload.Amount as :string,
+	TaxAmount: payload.Amount as :string,
+	DeliveryDate:  now as :datetime as :string { format: "yyyy-MM-dd'T'HH:mm:ss.SSS" },
+	Quantity: "1",
+	QuantityUnit: "EA"
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <set-property propertyName="Content-Tyoe" value="application/json" doc:name="Property"/>
+        <http:request config-ref="Get_SAP_Token" path="sap/opu/odata/iwbep/GWSAMPLE_BASIC/SalesOrderLineItemSet" method="POST" doc:name="HTTP">
+            <http:request-builder>
+                <http:header headerName="x-csrf-token" value="#[flowVars.'x-csrf-token']"/>
+                <http:header headerName="Content-Type" value="application/json"/>
+                <http:header headerName="Authorization" value="Basic UDIwMDA4Mjc1NDg6WjByYW5nIQ=="/>
+            </http:request-builder>
+        </http:request>
+        <object-to-string-transformer doc:name="Object to String"/>
+        <scatter-gather doc:name="Scatter-Gather">
+
+            <processor-chain>
+                <json:xml-to-json-transformer doc:name="XML to JSON"/>
+                <jms:outbound-endpoint exchange-pattern="request-response" queue="SAP to Salesforce" connector-ref="Active_MQ" doc:name="JMS"/>
+            </processor-chain>
+            <processor-chain>
+                <set-payload value="#[flowVars.SalesforceData1]" mimeType="application/json" doc:name="Set Payload"/>
+                <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+                <jms:outbound-endpoint queue="Salesforce to SAP" connector-ref="Active_MQ" doc:name="JMS"/>
+            </processor-chain>
+        </scatter-gather>
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-variable variableName="exception" value="#[message.exception]" doc:name="exception"/>
+            <logger level="INFO" doc:name="Logger"/>
+            <set-payload value="#[flowVars.exception]" doc:name="Set Payload"/>
+            <set-property propertyName="http.status" value="500" doc:name="Http Status"/>
+        </catch-exception-strategy>    </flow>
+</mule>

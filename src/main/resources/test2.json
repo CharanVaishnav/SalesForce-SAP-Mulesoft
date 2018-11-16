@@ -1,0 +1,14 @@
+{
+	"SalesOrderID": "0500000503",
+	"ItemPosition": "0000000010",
+	"ProductID": "HT-9999",
+	"Note": "EPM DG: SO ID 0500000000 Item 0000000010",
+	"NoteLanguage": "EN",
+	"CurrencyCode": "USD",
+	"GrossAmount": "1137.64",
+	"NetAmount": "956.00",
+	"TaxAmount": "181.64",
+	"DeliveryDate": "2017-12-07T23:00:00.0000000",
+	"Quantity": "1",
+	"QuantityUnit": "EA"
+}

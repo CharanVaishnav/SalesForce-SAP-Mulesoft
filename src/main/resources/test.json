@@ -1,0 +1,18 @@
+{
+	"Note": "EPM DG: SO ID 0500000032 Deliver as Test Charan2",
+	"NoteLanguage": "EN",
+	"CustomerID": "0100000006",
+	"CustomerName": "Asia High tech",
+	"CurrencyCode": "USD",
+	"GrossAmount": "9715.16",
+	"NetAmount": "8164.00",
+	"TaxAmount": "1551.16",
+	"LifecycleStatus": "P",
+	"LifecycleStatusDescription": "In Progress",
+	"BillingStatus": null,
+	"BillingStatusDescription": "Initial",
+	"DeliveryStatus": null,
+	"DeliveryStatusDescription": "Initial",
+	"CreatedAt": "2017-12-20T23:00:00.0000000",
+	"ChangedAt": "2017-12-20T23:00:00.0000000"
+}

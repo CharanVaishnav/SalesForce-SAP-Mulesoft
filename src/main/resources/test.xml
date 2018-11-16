@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entry xml:base="https://sapes5.sapdevcenter.com:443/sap/opu/odata/iwbep/GWSAMPLE_BASIC/" xmlns="http://www.w3.org/2005/Atom" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices">
+    <id>https://sapes5.sapdevcenter.com:443/sap/opu/odata/iwbep/GWSAMPLE_BASIC/SalesOrderSet('0500000512')</id>
+    <title type="text">SalesOrderSet('0500000512')</title>
+    <updated>2018-11-01T19:00:11Z</updated>
+    <category term="GWSAMPLE_BASIC.SalesOrder" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
+    <link href="SalesOrderSet('0500000512')" rel="self" title="SalesOrder"/>
+    <link href="SalesOrderSet('0500000512')/ToBusinessPartner" rel="http://schemas.microsoft.com/ado/2007/08/dataservices/related/ToBusinessPartner" type="application/atom+xml;type=entry" title="ToBusinessPartner"/>
+    <link href="SalesOrderSet('0500000512')/ToLineItems" rel="http://schemas.microsoft.com/ado/2007/08/dataservices/related/ToLineItems" type="application/atom+xml;type=feed" title="ToLineItems"/>
+    <content type="application/xml">
+        <m:properties>
+            <d:SalesOrderID>0500000512</d:SalesOrderID>
+            <d:Note>EPM DG: SO ID 0500000032 Deliver as Test Charan2</d:Note>
+            <d:NoteLanguage>EN</d:NoteLanguage>
+            <d:CustomerID>0100000006</d:CustomerID>
+            <d:CustomerName>Asia High tech</d:CustomerName>
+            <d:CurrencyCode>USD</d:CurrencyCode>
+            <d:GrossAmount>0.00</d:GrossAmount>
+            <d:NetAmount>0.00</d:NetAmount>
+            <d:TaxAmount>0.00</d:TaxAmount>
+            <d:LifecycleStatus>N</d:LifecycleStatus>
+            <d:LifecycleStatusDescription>New</d:LifecycleStatusDescription>
+            <d:BillingStatus/>
+            <d:BillingStatusDescription>Initial</d:BillingStatusDescription>
+            <d:DeliveryStatus/>
+            <d:DeliveryStatusDescription>Initial</d:DeliveryStatusDescription>
+            <d:CreatedAt>2018-11-01T19:00:11.4455860</d:CreatedAt>
+            <d:ChangedAt>2018-11-01T19:00:11.4455860</d:ChangedAt>
+        </m:properties>
+    </content>
+</entry>
